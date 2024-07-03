@@ -138,13 +138,16 @@ local function getRaceCastes(race_id)
     return unit_castes
 end
 
-local function getMapRaces(only_visible, include_friendly)
+local function getMapRaces(only_visible, include_friendly, include_adventurer)
     local map_races = {}
     for _, unit in pairs(df.global.world.units.active) do
         if only_visible and not dfhack.units.isVisible(unit) then
             goto skipunit
         end
         if not include_friendly and isUnitFriendly(unit) then
+            goto skipunit
+        end
+        if not include_adventurer and unit == df.global.world.units.adv_unit then
             goto skipunit
         end
         if dfhack.units.isActive(unit) and checkUnit(unit) then
@@ -170,6 +173,7 @@ local options, args = {
     method = killMethod.INSTANT,
     only_visible = false,
     include_friendly = false,
+    include_adventurer = false,
     limit = -1,
 }, {...}
 
@@ -178,6 +182,7 @@ local positionals = argparse.processArgsGetopt(args, {
     {'m', 'method', handler = function(arg) options.method = killMethod[arg:upper()] end, hasArg = true},
     {'o', 'only-visible', handler = function() options.only_visible = true end},
     {'f', 'include-friendly', handler = function() options.include_friendly = true end},
+    {'a', 'include-adventurer', handler = function() options.include_adventurer = true end},
     {'l', 'limit', handler = function(arg) options.limit = argparse.positiveInt(arg, 'limit') end, hasArg = true},
 })
 
@@ -200,7 +205,7 @@ if positionals[1] == "this" then
     return
 end
 
-local map_races = getMapRaces(options.only_visible, options.include_friendly)
+local map_races = getMapRaces(options.only_visible, options.include_friendly, options.include_adventurer)
 
 if not positionals[1] then
     local sorted_races = {}
@@ -243,6 +248,9 @@ elseif positionals[1]:split(':')[1] == "all" then
             goto skipunit
         end
         if not options.include_friendly and isUnitFriendly(unit) then
+            goto skipunit
+        end
+        if not options.include_adventurer and unit == df.global.world.units.adv_unit then
             goto skipunit
         end
         if selected_caste and selected_caste ~= df.creature_raw.find(unit.race).caste[unit.caste].caste_id then
@@ -297,6 +305,9 @@ else
             goto skipunit
         end
         if not options.include_friendly and isUnitFriendly(unit) then
+            goto skipunit
+        end
+        if not options.include_adventurer and unit == df.global.world.units.adv_unit then
             goto skipunit
         end
         if selected_caste and selected_caste ~= df.creature_raw.find(unit.race).caste[unit.caste].caste_id then
