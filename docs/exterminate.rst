@@ -47,7 +47,9 @@ Options
     Specifies the tool should only kill units visible to the player.
     on the map.
 ``-f``, ``--include-friendly``
-    Specifies the tool should also kill units friendly to the player.
+    Specifies the tool should also kill units friendly to the player. In Adventure Mode, this means your party members and companions.
+``-a``, ``--include-adventurer``
+    Include your own adventurer in the kill list, only relevant for the Adventure Mode. Otherwise, your adventurer is excluded.
 ``-l``, ``--limit <num>``
     Set the maximum number of units to exterminate.
 
